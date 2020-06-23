@@ -1,7 +1,8 @@
 const express = require('express');
 const {
     checkAuthentication,
-    getUserStatus
+    getUserStatus,
+
 } = require('../controllers/user');
 
 const {
@@ -21,7 +22,7 @@ router.get('/create/accessory', checkAuthentication, getUserStatus, (req, res) =
     })
 })
 
-router.post('/create/accessory', async (req, res) => {
+router.post('/create/accessory', checkAuthentication, async (req, res) => {
     const {
         name,
         description,
@@ -57,7 +58,7 @@ router.get('/attach/accessory/:id', checkAuthentication, getUserStatus, async (r
     }
 });
 
-router.post('/attach/accessory/:id', async (req, res, next) => {
+router.post('/attach/accessory/:id', checkAuthentication, async (req, res, next) => {
     const {
         accessory: accessoryId
     } = req.body;

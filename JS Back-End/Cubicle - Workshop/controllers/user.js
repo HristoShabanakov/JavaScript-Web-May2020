@@ -76,6 +76,24 @@ const checkAuthentication = (req, res, next) => {
     }
 }
 
+const authAccessJSON = (req, res, next) => {
+    const token = req.cookies['aid'];
+    if (!token) {
+        return res.json({
+            error: "Not authenticated"
+        });
+    }
+
+    try {
+        jwt.verify(token, config.privateKey);
+        next()
+    } catch (e) {
+        return res.json({
+            error: "Not authenticated"
+        });
+    }
+}
+
 const guestAccess = (req, res, next) => {
     const token = req.cookies['aid'];
     if (token) {

@@ -7,6 +7,7 @@ const Cube = require('../models/cube');
 const {
     checkAuthentication,
     getUserStatus,
+
 } = require('../controllers/user');
 
 const {
@@ -44,7 +45,7 @@ router.get('/create', checkAuthentication, getUserStatus, (req, res) => {
 });
 
 
-router.post('/create', (req, res) => {
+router.post('/create', checkAuthentication, (req, res) => {
     const {
         name,
         description,
