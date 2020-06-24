@@ -18,17 +18,32 @@ router.get('/login', guestAccess, getUserStatus, (req, res) => {
 });
 
 router.get('/signup', guestAccess, getUserStatus, (req, res) => {
+    const error = req.query.error ? 'Username or password is not valid' : null;
+
     res.render('registerPage', {
-        isLoggedIn: req.isLoggedIn
+        isLoggedIn: req.isLoggedIn,
+        error
     });
 });
 
 router.post('/signup', async (req, res) => {
-    const status = await saveUser(req, res);
+    const {
+        passowrd
+    } = req.body;
 
-    if (status) {
-        return res.redirect('/');
+    if (!passowrd || passowrd.length < 8 || !passowrd.match(/^[A-Za-z0-9]+$/)) {
+        res.redirect('/signup?error=true');
     }
+
+    const {
+        error
+    } = await saveUser(req, res);
+
+    if (error) {
+        return res.redirect('/signup?error=true');
+    }
+
+    res.redirect('/');
 
 });
 

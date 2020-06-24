@@ -21,21 +21,28 @@ const saveUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = new User({
-        username,
-        password: hashedPassword
-    });
+    try {
+        const user = new User({
+            username,
+            password: hashedPassword
+        });
 
-    const userObject = await user.save();
+        const userObject = await user.save();
 
-    const token = generateToken({
-        userID: userObject._id,
-        username: userObject.username
-    });
+        const token = generateToken({
+            userID: userObject._id,
+            username: userObject.username
+        });
 
-    res.cookie('aid', token);
+        res.cookie('aid', token);
 
-    return true;
+        return token;
+    } catch (err) {
+        return {
+            error: true,
+            message: err
+        }
+    }
 }
 
 const verifyUser = async (req, res) => {
@@ -123,5 +130,6 @@ module.exports = {
     verifyUser,
     checkAuthentication,
     guestAccess,
-    getUserStatus
+    getUserStatus,
+    authAccessJSON
 }
