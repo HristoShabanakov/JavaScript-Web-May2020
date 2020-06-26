@@ -52,21 +52,39 @@ const verifyUser = async (req, res) => {
 
     } = req.body;
 
-    const user = await User.findOne({
-        username
-    });
-
-    const status = await bcrypt.compare(password, user.password);
-
-    if (status) {
-        const token = generateToken({
-            userID: user._id,
-            username: user.username
+    try {
+        const user = await User.findOne({
+            username
         });
-        res.cookie('aid', token);
-    }
 
-    return status;
+        if (!user) {
+            return {
+                error: true,
+                message: "There is no such user !"
+            }
+        }
+
+        const status = await bcrypt.compare(password, user.password);
+
+        if (status) {
+            const token = generateToken({
+                userID: user._id,
+                username: user.username
+            });
+            res.cookie('aid', token);
+        }
+
+        return {
+            error: !status,
+            message: status || 'Wrong password'
+        }
+    } catch (err) {
+        return {
+            error: true,
+            message: "There is no such user !",
+            status
+        }
+    }
 }
 
 const checkAuthentication = (req, res, next) => {

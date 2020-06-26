@@ -1,59 +1,63 @@
-const express = require('express');
-const User = require('../models/user');
+const express = require('express')
 const {
     saveUser,
     verifyUser,
     guestAccess,
     getUserStatus
-} = require('../controllers/user');
+} = require('../controllers/user')
 
-
-
-const router = express.Router();
+const router = express.Router()
 
 router.get('/login', guestAccess, getUserStatus, (req, res) => {
+
     res.render('loginPage', {
         isLoggedIn: req.isLoggedIn
-    });
-});
+    })
+})
 
 router.get('/signup', guestAccess, getUserStatus, (req, res) => {
-    const error = req.query.error ? 'Username or password is not valid' : null;
-
     res.render('registerPage', {
-        isLoggedIn: req.isLoggedIn,
-        error
-    });
-});
+        isLoggedIn: req.isLoggedIn
+    })
+})
 
 router.post('/signup', async (req, res) => {
     const {
-        passowrd
-    } = req.body;
+        password
+    } = req.body
 
-    if (!passowrd || passowrd.length < 8 || !passowrd.match(/^[A-Za-z0-9]+$/)) {
-        res.redirect('/signup?error=true');
+    if (!password || password.length < 8 || !password.match(/^[A-Za-z0-9]+$/)) {
+        return res.render('registerPage', {
+            error: 'Username or password is not valid'
+        })
     }
 
     const {
         error
-    } = await saveUser(req, res);
+    } = await saveUser(req, res)
 
     if (error) {
-        return res.redirect('/signup?error=true');
+        return res.render('registerPage', {
+            error: 'Username or password is not valid'
+        })
     }
 
-    res.redirect('/');
-
-});
+    res.redirect('/')
+})
 
 router.post('/login', async (req, res) => {
-    const status = await verifyUser(req, res);
+    const {
+        error
+    } = await verifyUser(req, res)
 
-    if (status) {
-        return res.redirect('/');
+    if (error) {
+        return res.render('loginPage', {
+            error: 'Username or password is not correct'
+        })
     }
 
-});
+    res.redirect('/')
+})
 
-module.exports = router;
+
+module.exports = router
